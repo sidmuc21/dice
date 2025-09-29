@@ -4,12 +4,28 @@
   let diceFace = "⚀";
   let message = "Shake your device...";
   let lastShake = 0;
+  let isShaking = false;
+
+  const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
   function rollDice() {
-    const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-    const roll = Math.floor(Math.random() * 6);
-    diceFace = diceFaces[roll];
-    message = `You rolled a ${roll + 1}! 🎲`;
+    if (isShaking) return;
+
+    isShaking = true;
+
+    // Animate dice face changes
+    let count = 0;
+    const interval = setInterval(() => {
+      diceFace = diceFaces[Math.floor(Math.random() * 6)];
+      count++;
+      if (count > 8) { // spin 8 times
+        clearInterval(interval);
+        const roll = Math.floor(Math.random() * 6);
+        diceFace = diceFaces[roll];
+        message = `You rolled a ${roll + 1}! 🎲`;
+        isShaking = false;
+      }
+    }, 100);
   }
 
   function handleMotion(event) {
@@ -43,14 +59,34 @@
   });
 </script>
 
-<div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-pink-500 text-white">
-  <h1 class="text-3xl md:text-4xl font-bold mb-8">Shake the phone to roll the dice 🎲</h1>
+<style>
+  @keyframes dice-shake {
+    0%, 100% { transform: rotate(0deg) translate(0, 0); }
+    20% { transform: rotate(-10deg) translate(-2px, -2px); }
+    40% { transform: rotate(10deg) translate(2px, -2px); }
+    60% { transform: rotate(-10deg) translate(-2px, 2px); }
+    80% { transform: rotate(10deg) translate(2px, 2px); }
+  }
 
-  <div class="text-9xl mb-6 drop-shadow-lg">
-    {diceFace}
+  .shake {
+    animation: dice-shake 0.5s ease-in-out infinite;
+  }
+</style>
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 to-pink-500 text-white px-4">
+  <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center">
+    Shake the phone to roll the dice 🎲
+  </h1>
+
+  <div class="mb-6">
+    <div
+      class={`text-8xl sm:text-9xl drop-shadow-lg ${isShaking ? 'shake' : ''}`}
+    >
+      {diceFace}
+    </div>
   </div>
 
-  <div class="text-xl md:text-2xl font-medium mb-6">
+  <div class="text-lg sm:text-xl md:text-2xl font-medium mb-6 text-center">
     {message}
   </div>
 
